@@ -1,0 +1,82 @@
+Este sistema é separado em dois módulos: o cliente e o servidor. Este README contém os passos para
+o setup do módulo servidor em sua máquina (Linux).
+
+- Primeiramente verifique se o node e o npm estão instalados em sua máquina com os comandos abaixo
+
+        $node -v
+        $npm -v
+
+caso eles já estejam instalados continue após a linha tracejada;
+caso não, crie na pasta /opt um diretorio com o nome node
+
+        $sudo mkdir /opt/node
+
+e então baixe os linux binaries do link abaixo dentro desta pasta
+
+        https://nodejs.org/en/download/
+
+       
+Feito isso, com o terminal dentro desta pasta execute o comando abaixo para extrair
+
+        $sudo tar -xvf nome-do-pacote.tar.xz
+
+e então adicione os binarios no PATH com o comando abaixo para pode chamar o node e o npm do terminal
+
+        $export PATH=$PATH:/opt/node/node-v14.15.0-linux-x64/bin
+        $chmod +x /opt/node/node-v14.15.0-linux-x64/bin/*
+
+-------------------------------------------------------------------------------------------------------
+- Entre no postgres com o comando seguinte
+
+        psql template1
+
+e crie um banco com o nome sistemaged
+
+        create database sistemaged;
+
+e para sair
+
+        \q
+
+- Agora crie uma pasta para baixar os módulos do sistema
+
+        $mkdir sistema-ged
+        $cd sistema-ged
+
+E baixe os módulos no github.
+Realizado o download na pasta criada, vá para a pasta do modulo do servidor
+
+        $cd gedsystem-tcc-api
+
+e execute o comando abaixo para instalar as dependencias do projeto
+
+        $sudo npm install
+
+e crie uma pasta com o nome documentosStorage
+
+        $mkdir documentosStorage
+
+Abra o documento que está dentro da pasta
+
+        /config/database.js
+
+com seu editor de texto preferido e altere o username e password do item DEVELOPMENT para os
+que utiliza para logar no postgres.
+
+Daí, execute os comandos abaixo para criar as relacoes no database
+
+        $sudo npm run migrate
+
+        $sudo npm run seed
+
+Por fim, na raiz da pasta do servidor (sistema-ged/gedsystem-tcc-api) execute o comando 
+
+        $npm run dev
+
+A api estara aceitando requests em 127.0.0.1:3000.
+Agora prossiga para a instalação do cliente.
+
+User default:
+
+- Registro: 12345
+- Senha: admin
