@@ -13,7 +13,7 @@ var storage = multer.memoryStorage()
 var upload = multer({ storage: storage })
 
 // Import modules
-const verifyJWT = require('../helpers/verifyJWT');
+const verify_jwt = require('../helpers/verify-jwt');
 
 // Import the application logic wiring
 const models = require('../models');
@@ -51,8 +51,8 @@ try {
     });
   });
 //----------------SOME CONFIG-------------------------------------------------
-  //app.use(verifyJWT);
-  router.get('validateJWT', usuario.validateJWT);
+  //app.use(verify_jwt);
+  router.get('validate-jwt', usuario.validate_jwt);
   
   router.get('/', (req, res) => {
     res.status(200).json("Welcome to GED System app");
@@ -179,7 +179,6 @@ try {
   router.post('/importarDados', registroAtividade.importarDados);
   router.post('/exportarDados', registroAtividade.exportarDados);
   router.delete('/limparDados', tabelaPontuacao.limparDados);
-
 }
 catch(e) {
   console.log('Path: route/index.js');

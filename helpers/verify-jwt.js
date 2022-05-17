@@ -1,6 +1,6 @@
 var jwt = require('jsonwebtoken');
 
-function verifyJWT(req, res, next){
+function verify_jwt(req, res, next){
     var token = req.headers.authorization;
     //console.log(req.headers.authorization);
     if (!token) return res.status(401).send({ auth: false, message: 'No token provided.' });
@@ -14,4 +14,4 @@ function verifyJWT(req, res, next){
     });
 }
 
-module.exports = verifyJWT;
+module.exports = verify_jwt;

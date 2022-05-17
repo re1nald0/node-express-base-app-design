@@ -725,34 +725,28 @@ async function createGruposHandler(id, grupos) {
 }
 
 async function createSubgruposHandler(idGrupo, subgrupos) {
-
     let iSub = 0;
 
     subgrupos.forEach(async newSubgrupo => {
-
         let subgrupoData = {
             organizacaoTabelaIdOrganizacaoTabela: idGrupo,
             grupoSubgrupoIdGrupoSubgrupo: newSubgrupo.subgrupo.idGrupoSubgrupo,
             pontuacaoMinimaExigida: newSubgrupo.pontuacaoMinimaExigida,
             valorSaturacao: newSubgrupo.valorSaturacao
             // levaExcedente: newSubgrupo.levaExcedente
-        }
+        };
 
         iSub = iSub + 10;
 
         setTimeout(async function() {
-
-            await organizacaoTabela.create(subgrupoData)
-            .then(subgrupoResult => {
-                console.log(subgrupoResult)
-            })
-            .catch(error => {        
+            await organizacaoTabela.create(subgrupoData).then(subgrupoResult => {
+                console.log(subgrupoResult);
+            }).catch(error => {        
                 console.log(error);
                 res.status(500).send(error);
-            })
-
-        }, 10 + iSub)
-    })
+            });
+        }, 10 + iSub);
+    });
 }
 
 // async function createSaturacoesHandler(id, saturacoes) {
@@ -943,12 +937,9 @@ async function createGrupo(req, res) {
 }
 
 async function createSubgrupo(req, res) {
-    
     try {
-        
         let id = req.body.organizacaoTabelaIdOrganizacaoTabela;
         let idTabelaPontuacao = req.body.idTabelaPontuacao;
-
         let subgrupoData = {
             organizacaoTabelaIdOrganizacaoTabela: id,
             grupoSubgrupoIdGrupoSubgrupo: req.body.grupoSubgrupoIdGrupoSubgrupo,
@@ -957,21 +948,17 @@ async function createSubgrupo(req, res) {
             // levaExcedente: req.body.levaExcedente
         }
 
-        await organizacaoTabela.create(subgrupoData)
-            .then(async subgrupoResult => {
+        await organizacaoTabela.create(subgrupoData).then(async subgrupoResult => {
                 // console.log('-------------------------------')
                 // console.log(grupoResult.idOrganizacaoTabela)
                 // console.log('-------------------------------')
-
                 await fixCreateGrupoSubgrupoUsuariosBind(idTabelaPontuacao, subgrupoResult.idOrganizacaoTabela);
 
                 res.status(200).json({ "message": "subgrupo criado com sucesso", "data": subgrupoResult });
-            })
-            .catch(error => {        
+            }).catch(error => {        
                 console.log(error);
                 res.status(500).send(error);
             })
-
     } catch(e) {
         console.log(e);
         res.status(500).send(e);
@@ -1037,20 +1024,16 @@ async function fixDeleteGrupoSubgrupoUsuariosBind(idOrganizacaoTabela) {
 }
 
 async function deleteGrupo(req, res) {
-    
     try {
-        
         let idTabelaPontuacao = req.body.idTabelaPontuacao;
         let id = req.body.idOrganizacaoTabela;
 
         await fixDeleteGrupoSubgrupoUsuariosBind(id);
-
         await organizacaoTabela.findAll({
             where: {
                 idOrganizacaoTabela: id
             }
-        })
-        .then(async data => {
+        }).then(async data => {
             if(data.length <= 0) {
                 res.status(404).send("Nao existe grupo com este id");
             }
@@ -1059,22 +1042,18 @@ async function deleteGrupo(req, res) {
                     where: {
                         idOrganizacaoTabela: id
                     }
-                })
-                .then(deletedData => {
+                }).then(deletedData => {
 
                     res.status(200).json(deletedData);
-                })
-                .catch(error => {
+                }).catch(error => {
                     console.log(error);
                     res.status(500).send(error);
                 })
             }
-        })
-        .catch(error => {
+        }).catch(error => {
             console.log(error);
             res.status(500).send(error);
         })
-
     } catch(e) {
         console.log(e);
         res.status(500).send(e);
@@ -1082,17 +1061,14 @@ async function deleteGrupo(req, res) {
 }
 
 async function isGrupo(req, res) {
-
     try {
-        
         let id = req.params.idOrganizacaoTabela;
 
         await organizacaoTabela.findAll({
             where: {
                 idOrganizacaoTabela: id
             }
-        })
-        .then(data => {
+        }).then(data => {
             if(data.length <= 0) {
                 res.status(404).send("Nao existe grupo/subgrupo com este id");
             }
@@ -1107,23 +1083,18 @@ async function isGrupo(req, res) {
                     res.status(200).json({ 'isGrupo': 0, 'idGrupo': data[0].dataValues.organizacaoTabelaIdOrganizacaoTabela })
                 }
             }
-        })
-        .catch(error => {
+        }).catch(error => {
             console.log(error);
             res.status(500).send(error);
         })
-
     } catch(e) {
         console.log(e);
         res.status(500).send(e);
     }
-
 }
 
 async function limparDados(req, res) {
-
     try {
-        
         let idUsuario = req.body.idUsuario;
         let idTabelaPontuacao = req.body.idTabelaPontuacao;
 
@@ -1134,8 +1105,7 @@ async function limparDados(req, res) {
             include: {
                 model: documento
             }
-        })
-        .then(data => {
+        }).then(data => {
             data.forEach(registroData => {
                 if(registroData.documentos.length > 0) {
                     registroData.documentos.forEach(documentoData => {
@@ -1145,26 +1115,23 @@ async function limparDados(req, res) {
                     })
                 }
             })
-        })
-        .then(async () => {
-            let registroAtividadeRemoved = await sequelize.query('DELETE from "registroAtividade" WHERE "usuarioIdUsuario" = ' + idUsuario, { type: QueryTypes.DELETE });
-            let pontuacaoCleanedBind = await sequelize.query('UPDATE "pontuacaoBind" SET "qtAtividadesRealizadas" = 0, "qtHorasRealizadas" = 0 WHERE "usuarioIdUsuario" = ' + idUsuario, { type: QueryTypes.UPDATE });
-            let organizacaoTabelaCleanedBind = await sequelize.query('UPDATE "organizacaoTabelaBind" SET "pontuacaoAtual" = 0 WHERE "usuarioIdUsuario" = ' + idUsuario, { type: QueryTypes.UPDATE });
-        })
-        .catch(e => {
+        }).then(async () => {
+            let registroAtividadeRemoved =
+                await sequelize.query('DELETE from "registroAtividade" WHERE "usuarioIdUsuario" = ' + idUsuario, { type: QueryTypes.DELETE });
+            let pontuacaoCleanedBind =
+                await sequelize.query('UPDATE "pontuacaoBind" SET "qtAtividadesRealizadas" = 0, "qtHorasRealizadas" = 0 WHERE "usuarioIdUsuario" = ' + idUsuario, { type: QueryTypes.UPDATE });
+            let organizacaoTabelaCleanedBind =
+                await sequelize.query('UPDATE "organizacaoTabelaBind" SET "pontuacaoAtual" = 0 WHERE "usuarioIdUsuario" = ' + idUsuario, { type: QueryTypes.UPDATE });
+        }).catch(e => {
             console.log(e);
             res.status(500).send(e);
         })
 
-        
-
         res.status(200).json({ 'message': 'Cata Cleaned' });
-
     } catch(e) {
         console.log(e);
         res.status(500).send(e);
     }
-
 }
 
 

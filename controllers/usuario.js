@@ -11,16 +11,13 @@ const { sequelize } = require('../models');
 const { QueryTypes } = require('sequelize');
 
 async function login(req, res) {
-    
     try {
-
         if(req.body.registro != undefined && req.body.password != undefined) {
             await usuario.findOne({
                 where: {
                     registro: req.body.registro
                 }
-            })
-            .then(async result => {
+            }).then(async result => {
                 console.log('---RESULT USUARIO QUERY---')
                 console.log(result)
 
@@ -28,7 +25,6 @@ async function login(req, res) {
                     res.status(404).send("Nao existe usuario cadastrado com esse registro");
                 }
                 else {
-
                     //let resultSTRING = JSON.stringify(result);
                     //let userData = JSON.parse(resultSTRING);
                     //console.log(userData);
@@ -49,8 +45,7 @@ async function login(req, res) {
                         res.status(401).send("Senha incorreta");
                     }
                 }
-            })
-            .catch(error => {
+            }).catch(error => {
                 console.log(error);
                 res.status(203).send();
             })
@@ -59,31 +54,25 @@ async function login(req, res) {
             console.log(error);
             res.status(500).send();
         }
-
     } catch(e) {
         console.log(e);
         res.status(500).send(e);
     }
 }
 
-async function validateJWT(req, res) {
-
+async function validateJwt(req, res) {
     var token = req.headers.authorization;
     //console.log(req.headers.authorization);
     
     jwt.verify(token, process.env.SECRET, function(err, decoded) {
       if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
-      
       // se tudo estiver ok, salva no request para uso posterior
       res.status(200).send({ auth: true, message: 'Token authenticated' });
     });
-
 }
 
 async function updatePassword(req, res) {
-
      try {
-
          const id = req.body.idUsuario
          const oldPassword = req.body.oldPassword
          const newPassword = req.body.newPassword
@@ -92,10 +81,8 @@ async function updatePassword(req, res) {
             where: {
                 idUsuario: id
             }
-        })
-        .then(async result => {
+        }).then(async result => {
             console.log(result[0].dataValues)
-            
             if(bcrypt.compareSync(oldPassword, result[0].dataValues.password)) {
                 let newHashedPassword = bcrypt.hashSync(newPassword, 8);
                 result.password = newHashedPassword
@@ -104,12 +91,10 @@ async function updatePassword(req, res) {
                     where: {
                         idUsuario: id
                     }
-                })
-                .then(updatedData => {
+                }).then(updatedData => {
                     console.log(updatedData)
                     res.status(200).json(updatedData);
-                })
-                .catch(e => {
+                }).catch(e => {
                     console.log(e);
                     res.status(500).send(e);
                 })
@@ -117,22 +102,17 @@ async function updatePassword(req, res) {
             else {
                 res.status(401).send("Senha incorreta");
             }
-
-        })
-        .catch(error => {
+        }).catch(error => {
             console.log(error);
             res.status(500).send(error);
         })
-
     } catch(e) {
         console.log(e);
         res.status(500).send(e);
     }
-
 }
 
 async function checkAdmin(req, res) {
-
     //console.log(req.body.token);
     var token = req.body.token;
 
@@ -161,9 +141,7 @@ async function checkAdmin(req, res) {
 }
 
 async function getUser(req, res) {
-    
     try {
-        
         await usuario.findAll({
             where: {
                 idUsuario: req.params.id
@@ -183,15 +161,12 @@ async function getUser(req, res) {
             //         ]
             //     }
             // ]
-        })
-        .then(result => {
+        }).then(result => {
             res.status(200).json(result);
-        })
-        .catch(error => {
+        }).catch(error => {
             console.log(error);
             res.status(500).send(error);
         })
-
     } catch(e) {
         console.log(e);
         res.status(500).send(e);
@@ -199,9 +174,7 @@ async function getUser(req, res) {
 }
 
 async function getAllUser(req, res) {
-    
     try {
-        
         await usuario.findAll({
             // include: [
             //     {
@@ -218,20 +191,17 @@ async function getAllUser(req, res) {
             //         ]
             //     }
             // ]
-        })
-        .then(result => {
+        }).then(result => {
             if(result.length <= 0) {
                 res.status(404).send("Nao existem usuarios cadastrados");
             }
             else {
                 res.status(200).json(result);
             }
-        })
-        .catch(error => {
+        }).catch(error => {
             console.log(error);
             res.status(500).send(error);
         })
-
     } catch(e) {
         console.log(e);
         res.status(500).send(e);
@@ -239,9 +209,7 @@ async function getAllUser(req, res) {
 }
 
 async function newUser(req, res) {
-    
     try {
-        
         await usuario.findAll({
             where: {
                 [Op.or]: {
@@ -249,16 +217,13 @@ async function newUser(req, res) {
                     email: req.body.email
                 }
             }
-        })
-        .then(async result => {
+        }).then(async result => {
             //console.log(result);
             if(result.length > 0) {
                 res.status(203).send("Ja existe usuario com esse email ou registro");
             }
             else {
-
                 let encryptedPass = bcrypt.hashSync(req.body.password, 8);
-
                 let newUser = {
                     name: req.body.name,
                     registro: req.body.registro,
@@ -271,9 +236,7 @@ async function newUser(req, res) {
                 //     newUser.nivelIdNivel = req.body.nivelIdNivel.idNivel;
                 // }
 
-                //console.log(newUser)
-                await usuario.create(newUser)
-                .then(data => {
+                await usuario.create(newUser).then(data => {
                     let parsedData = _.cloneDeep(data.dataValues)
                     let endResult = {
                         idUsuario: parsedData.idUsuario,
@@ -284,17 +247,14 @@ async function newUser(req, res) {
                     }
 
                     res.status(200).json({"Mensagem": "Usuario criado com sucesso", "data": endResult});
-                })
-                .catch(error => {
+                }).catch(error => {
                     res.status(500).send(error);
                 })
             }
-        })
-        .catch(error => {
+        }).catch(error => {
             console.log(error);
             res.status(500).send(error);
         });
-
     } catch(e) {
         console.log(e);
         res.status(500).send(e);
@@ -302,11 +262,8 @@ async function newUser(req, res) {
 }
 
 async function updateUser(req, res) {
-    
     try {
-
         console.log(req.body)
-        
         let id = req.body.idUsuario;
 
         // let updatedUserData = {
@@ -324,8 +281,7 @@ async function updateUser(req, res) {
             where: {
                 idUsuario: id
             }
-        })
-        .then(async result => {
+        }).then(async result => {
             if(result.length <= 0) {
                 res.status(404).send("Nenhum usuario encontrado no banco");
             }
@@ -346,20 +302,16 @@ async function updateUser(req, res) {
                 where: {
                     idUsuario: id
                 }
-            })
-            .then(result => {
+            }).then(result => {
                 res.status(200).json(result);
-            })
-            .catch(error => {
+            }).catch(error => {
                 console.log(error);
                 res.status(500).send(error);
             })
-        })
-        .catch(error => {
+        }).catch(error => {
             console.log(error);
             res.status(500).send(error);
         });
-
     } catch(e) {
         console.log(e);
         res.status(500).send(e);
@@ -367,19 +319,15 @@ async function updateUser(req, res) {
 }
 
 async function updateMyData(req, res) {
-    
     try {
-
         console.log(req.body)
         
         let id = req.body.idUsuario;
-
         await usuario.findAll({
             where: {
                 idUsuario: id
             }
-        })
-        .then(async result => {
+        }).then(async result => {
             if(result.length <= 0) {
                 res.status(404).send("Nenhum usuario encontrado no banco");
             }
@@ -392,20 +340,16 @@ async function updateMyData(req, res) {
                 where: {
                     idUsuario: id
                 }
-            })
-            .then(result => {
+            }).then(result => {
                 res.status(200).json(result);
-            })
-            .catch(error => {
+            }).catch(error => {
                 console.log(error);
                 res.status(500).send(error);
-            })
-        })
-        .catch(error => {
+            });
+        }).catch(error => {
             console.log(error);
             res.status(500).send(error);
         });
-
     } catch(e) {
         console.log(e);
         res.status(500).send(e);
@@ -413,33 +357,25 @@ async function updateMyData(req, res) {
 }
 
 async function deleteUser(req, res) {
-    
     try {
-        
         let id = req.body.idUsuario;
 
         await usuario.findAll({
             where: {
                 idUsuario: id
             }
-        })
-        .then(async data => {
+        }).then(async data => {
             if(data.length <= 0) {
                 res.status(404).send("Nao existe usuario com este id");
-            }
-            else {
-
+            } else {
                 // try {
-
                     await usuario.destroy({
                         where: {
                             idUsuario: id
                         }
-                    })
-                    .then(deletedData => {
+                    }).then(deletedData => {
                         res.status(200).json(deletedData);
-                    })
-                    .catch(error => {
+                    }).catch(error => {
                         console.log(error);
                         res.status(500).send(error);
                     })
@@ -449,12 +385,10 @@ async function deleteUser(req, res) {
                 //     res.status(500).send(e);
                 // }
             }
-        })
-        .catch(error => {
+        }).catch(error => {
             console.log(error);
             res.status(500).send(error);
         })
-
     } catch(e) {
         console.log(e);
         res.status(500).send(e);
@@ -463,7 +397,7 @@ async function deleteUser(req, res) {
 
 module.exports = {
     login,
-    validateJWT,
+    validateJwt,
     checkAdmin,
     updatePassword,
     getUser,
