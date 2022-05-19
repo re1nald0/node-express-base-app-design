@@ -25,9 +25,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Config the routing system
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+// var usersRouter = require('./routes/users');
 app.use('/', indexRouter);
-app.use('/files/:fileName', usersRouter);
+// app.use('/files/:fileName', usersRouter);
 app.use((req, res, next) => { //No cache, os requests sao executados toda vez
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
   next();
@@ -44,6 +44,7 @@ app.use(function(err, req, res, next) { // error handler
   console.log('Path: app.js');
   console.log('----------------------ERROR----------------------');
   console.log(err);
+  console.log('-------------------------------------------------');
 });
 
 module.exports = app;
