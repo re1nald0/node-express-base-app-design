@@ -1,14 +1,12 @@
-const { usuario } = require('../models');
-const { nivel } = require('../models');
-const { classe } = require('../models');
-const { tipoCarreira } = require('../models');
-const bcrypt = require('bcrypt');
-var jwt = require('jsonwebtoken');
 const { Op } = require("sequelize");
 var _ = require('lodash');
-
-const { sequelize } = require('../models');
+const bcrypt = require('bcrypt');
+var jwt = require('jsonwebtoken');
+var datetime = require('node-datetime');
 const { QueryTypes } = require('sequelize');
+const { sequelize } = require('../models');
+const { user } = require('../models');
+
 
 async function login(req, res) {
     try {

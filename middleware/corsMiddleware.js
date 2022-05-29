@@ -1,4 +1,4 @@
-module.exports = async (req, res, next) => {
+async function corsMiddleware(req, res, next) {
     var whitelist = [
         'http://localhost',
         'http://localhost:3000',
@@ -19,4 +19,8 @@ module.exports = async (req, res, next) => {
     }
 
     next();
+}
+
+module.exports = {
+    corsMiddleware
 }
