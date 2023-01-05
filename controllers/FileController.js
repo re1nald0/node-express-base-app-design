@@ -432,12 +432,10 @@ async function downloadComprobatorios(req, res) {
         const directoryPath = req.body.directoryPath;
         const folderPath = req.body.folderPath;
         
-        await zip(folderPath, folderPath + '.zip')
-        .then(zippedData => {
+        await zip(folderPath, folderPath + '.zip').then(zippedData => {
             fs.rmdirSync(folderPath, { recursive: true })
             res.download(folderPath + '.zip')
-        })
-        .catch(e => {
+        }).catch(e => {
             console.log(e);
             res.status(500).send(e);
         })
